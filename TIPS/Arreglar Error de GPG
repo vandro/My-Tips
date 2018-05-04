@@ -1,0 +1,58 @@
+Arreglar Error de GPG: http://ppa.launchpad.net
+NOTA: Los métodos más rápidos para añadir una clave de un repositorio PPA están al final de este post. 
+
+Recientemente, al ejecutar: 
+
+sudo aptitude update 
+
+en el terminal me mostraba este error al final: 
+
+W: Error de GPG: http://ppa.launchpad.net intrepid Release Las firmas siguientes no se pudieron verificar porque su llave pública no está disponible: NO_PUBKEY 1CD52D7BAAFE086A 
+
+Parece que esto es debido a que los repositorios de http://ppa.launchpad.net están progresivamente incluyendo una clave GPG para cada uno de ellos. Aquí hay más información: 
+https://bugs.launchpad.net/soyuz/+bug/125103 
+
+Para añadir las claves de estos repositorios he hecho lo siguiente: 
+
+1.- Copiar los últimos 8 dígitos del error que muestr apt-get o aptitude. El error es: 
+
+W: Error de GPG: http://ppa.launchpad.net intrepid Release Las firmas siguientes no se pudieron verificar porque su llave pública no está disponible: NO_PUBKEY 1CD52D7BAAFE086A 
+
+Y por tanto, nos quedamos con el número 
+
+2.- Abrimos el terminal y ejecutamos esto: 
+
+gpg --keyserver keyserver.ubuntu.com --recv-keys AAFE086A 
+
+Tras lo que aparecerá algo como esto: 
+
+gpg: solicitando clave AAFE086A de hkp servidor keyserver.ubuntu.com 
+gpg: clave AAFE086A: clave pública "Launchpad PPA for OpenOffice.org Scribblers" importada 
+gpg: Cantidad total procesada: 1 
+gpg: importadas: 1 (RSA: 1) 
+
+Y luego: 
+
+gpg --export --armor AAFE086A | sudo apt-key add - 
+
+Este último comando debería devolver esta respuesta: 
+
+OK 
+
+ALTERNATIVA: Puedes agrupar estos 2 comandos en uno sólo, si lo prefieres: 
+
+gpg --keyserver keyserver.ubuntu.com --recv-keys AAFE086A && gpg --export -a AAFE086A | sudo apt-key add -
+
+ALTERNATIVA 2: Un comando más corto para hacer esto mismo: 
+
+sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com AAFE086A 
+
+3.- Por último, volver a ejecutar: 
+
+sudo aptitude update 
+
+Para comprobar que ya no aparece el error... 
+
+Espero que les sirva. 
+
+Saludos!!! 
